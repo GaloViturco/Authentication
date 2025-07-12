@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha Test</title>
+</head>
+<body>
+    <h1>Captcha Test</h1>
+    
+    <p>Generar Captcha:</p>
+    <img id="captchaImage" src="" alt="Captcha" width="300px" />
+
+    <script>
+        // Realizar la solicitud GET al microservicio de captcha
+        async function fetchCaptcha() {
+            try {
+                const response = await fetch('http://52.5.241.128:5000/generate-captcha', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'image/png',
+                    }
+                });
+
+                // Si la respuesta es exitosa, mostrar la imagen en el elemento <img>
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+                    document.getElementById('captchaImage').src = imageUrl;
+                } else {
+                    alert('Error al cargar el captcha');
+                }
+            } catch (error) {
+                console.error('Error al cargar el captcha:', error);
+                alert('Error al cargar el captcha');
+            }
+        }
+
+        // Llamar a la función para obtener el captcha
+        fetchCaptcha();
+    </script>
+</body>
+</html>
