@@ -1,0 +1,64 @@
+name: Deploy Authentication Services to EC2
+
+on:
+  push:
+    branches:
+      - test  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Set up SSH key for EC2
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build Docker images for login and register services
+      run: |
+        docker build -t galo12/login-service ./Login
+        docker build -t galo12/register-service ./Register
+        docker build -t galo12/captcha ./captcha-microservice
+        docker build -t galo12/password ./password-microservice
+
+    - name: Push images to Docker Hub
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push galo12/login-service
+        docker push galo12/register-service
+        docker push galo12/captcha
+        docker push galo12/password
+
+    - name: Deploy services to EC2
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 3.93.159.35 
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # De
+          docker stop login-service || true
+          docker rm login-service || true
+          docker stop register-service || true
+          docker rm register-service || true
+          docker stop captcha || true
+          docker rm captcha || true
+          docker stop password || true
+          docker rm password || true
+
+          # D
+          docker pull galo12/login-service
+          docker pull galo12/register-service
+          docker pull galo12/captcha
+          docker pull galo12/password
+
+          # Eje
+          docker run -d --name login-service -p 8001:8001 --restart unless-stopped galo12/login-service
+          docker run -d --name register-service -p 8002:8002 --restart unless-stopped galo12/register-service
+          docker run -d --name captcha -p 5000:5000 --restart unless-stopped galo12/captcha
+          docker run -d --name password -p 8003:8003 --restart unless-stopped galo12/password
