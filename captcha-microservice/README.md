@@ -49,18 +49,18 @@ The **Captcha Microservice** ensures that users interacting with the system are 
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.dev/Loony213/Authentication2
+    git clone https://github.com/GaloViturco/Authentication
     cd Authentication2
     ```
 
 2. **Build the Docker Image**:
     ```bash
-    docker build -t kamartinez/captcha .
+    docker build -t galo12/captcha .
     ```
 
 3. **Run the Docker Container**:
     ```bash
-    docker run -d --name captcha-microservice -p 80:80 --restart unless-stopped kamartinez/captcha
+    docker run -d --name captcha-microservice -p 80:80 --restart unless-stopped galo12/captcha
     ```
 
     This will run the microservice on port 80, making it accessible through your host machine.
